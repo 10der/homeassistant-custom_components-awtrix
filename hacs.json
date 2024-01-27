@@ -1,6 +1,6 @@
 {
   "name": "awtrix notification",
   "iot_class": "Local Push",
-  "domain": "awtrix",
+  "domain": "notification",
   "render_readme": true
 }
