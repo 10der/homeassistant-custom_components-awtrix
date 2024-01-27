@@ -1,6 +1,5 @@
-(
-  "name": "awtrix notification",
-  "domains": ["awtrix", "notification"],
+{
+  "name": "AWTRIX Notifications",
   "render_readme": true,
   "homeassistant": "2022.11"
 }
