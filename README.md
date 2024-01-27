@@ -1,19 +1,12 @@
 # homeassistant-custom_components-awtrix
 HASS awtrix 
 
-# notify.yaml
+just add to
+# configuration.yaml 
 
 ```
-- name: awtrix_bedroom
-  platform: awtrix
-  device: awtrix_7c43d4
-
-- name: awtrix_hall
-  platform: awtrix
-  device: awtrix_diy
+awtrix:
 ```
-
-<img alt='Hass awtrix entity' src='hass-config.png'/>
 
 # example
 
@@ -21,10 +14,14 @@ HASS awtrix
 service: notify.awtrix_bedroom
 data:
   message: The garage door has been open for 10 minutes.
-  title: Your Garage Door Friend
-  target: platform specific
+```
+
+or extend format
+```
+service: notify.awtrix_bedroom
+data:
+  message: The garage door has been open for 10 minutes.
   data:
     icon: "33655"
     sound: beep
 ```
-
