@@ -5,7 +5,7 @@ import logging
 
 from homeassistant.components.notify import ATTR_DATA, BaseNotificationService
 
-CONF_DEVICE = "device"
+from .const import CONF_DEVICE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ async def async_get_service(hass, config, discovery_info=None):
     if discovery_info is None:
         return None
 
-    entity_id =  discovery_info["device"]
+    entity_id =  discovery_info[CONF_DEVICE]
     return AwtrixNotificationService(entity_id)
 
 
