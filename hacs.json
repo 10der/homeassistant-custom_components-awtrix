@@ -1,4 +1,4 @@
-(
+{
   "name": "awtrix notification",
   "domains": ["awtrix", "notification"],
   "render_readme": true,
