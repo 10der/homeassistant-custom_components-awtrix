@@ -68,8 +68,10 @@ class AwtrixNotificationService(BaseNotificationService):
 
 def getIcon(url):
     """Get icon by url."""
+
+    icon = None
     try:
-        timeout=5
+        timeout = 5
         response = requests.get(url, timeout=timeout)
         if response and response.status_code == 200:
             pil_im = Image.open(BytesIO(response.content))
@@ -77,6 +79,8 @@ def getIcon(url):
             b = BytesIO()
             pil_im.save(b, 'jpeg')
             im_bytes = b.getvalue()
-            return base64.b64encode(im_bytes).decode()
+            icon = base64.b64encode(im_bytes).decode()
     except Exception as err:
         _LOGGER.exception(err)
+    finally:
+        return icon
