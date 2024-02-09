@@ -28,10 +28,10 @@ async def async_get_service(hass, config, discovery_info=None):
 ########################################################################################################
 
 class AwtrixNotificationService(BaseNotificationService):
-    """Implement the notification service for Awtric."""
+    """Implement the notification service for Awtrix."""
 
     def __init__(self, entity_id):
-        """Init the notification service for Awtric."""
+        """Init the notification service for Awtrix."""
         self.entity_id = entity_id
 
     async def notification(self, topic, message, data):
@@ -68,10 +68,8 @@ class AwtrixNotificationService(BaseNotificationService):
 
 def getIcon(url):
     """Get icon by url."""
-
-    icon = None
     try:
-        timeout = 5
+        timeout=5
         response = requests.get(url, timeout=timeout)
         if response and response.status_code == 200:
             pil_im = Image.open(BytesIO(response.content))
@@ -79,8 +77,6 @@ def getIcon(url):
             b = BytesIO()
             pil_im.save(b, 'jpeg')
             im_bytes = b.getvalue()
-            icon = base64.b64encode(im_bytes).decode()
+            return base64.b64encode(im_bytes).decode()
     except Exception as err:
         _LOGGER.exception(err)
-    finally:
-        return icon
