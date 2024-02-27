@@ -84,3 +84,21 @@ data:
   device: awtrix_bedroom
   name: Time    
 ```
+
+# back
+
+```
+service: awtrix.settings
+data:
+  device: awtrix_bedroom
+  data:
+    WD: true 
+    TIME_COL: 
+      - 255
+      - 255
+      - 255
+    TMODE: 1 
+    BRI: 1
+    ABRI: true
+    ATRANS: true
+```
