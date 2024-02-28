@@ -33,9 +33,8 @@ ver 20240209.01
 # Create a custom app
 
 ```
-service: awtrix.push_app_data
+service: awtrix.awtrix_bedroom_push_app_data
 data: 
-  device: awtrix_bedroom
   name: test
   data:
     text : "Hello, AWTRIX Light!"
@@ -50,11 +49,9 @@ data:
 # Remove app
 
 ```
-service: awtrix.push_app_data
+service: awtrix.awtrix_bedroom_push_app_data
 data: 
-  device: awtrix_bedroom
   name: test
-  data: 
 ```
 
 ver 20240226.01
@@ -62,10 +59,8 @@ ver 20240226.01
 # Change Settings
 
 ```
-service: awtrix.settings
+service: awtrix.awtrix_bedroom_settings
 data:
-  device: awtrix_bedroom
-  data:
     WD: false 
     TIME_COL: 
       - 255
@@ -80,18 +75,16 @@ data:
 # Switch to App name
 
 ```
-data:
-  device: awtrix_bedroom
-  name: Time    
+service: awtrix.awtrix_bedroom_switch_app
+data: 
+  name: Time
 ```
 
 # back
 
 ```
-service: awtrix.settings
+service: awtrix.awtrix_bedroom_settings
 data:
-  device: awtrix_bedroom
-  data:
     WD: true 
     TIME_COL: 
       - 255

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+from functools import partial
 import logging
 
 from homeassistant.const import CONF_NAME, Platform
-from homeassistant.core import ServiceCall, callback
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.core import ServiceCall
 from homeassistant.helpers import (
     device_registry as dr,
     discovery,
@@ -14,13 +14,24 @@ from homeassistant.helpers import (
 )
 
 from .awtrix import AwtrixTime
-from .const import CONF_DEVICE, DATA_CONFIG_ENTRIES, DOMAIN
+from .const import CONF_DEVICE, DATA_CONFIG_ENTRIES, DOMAIN, SERVICES
 
 _LOGGER = logging.getLogger(__name__)
 
-
 async def async_setup(hass, config):
     """Set up the Awtrix."""
+
+    async def service_handler(entry_data, service, call: ServiceCall) -> None:
+        """Handle service call."""
+
+        device = AwtrixTime(hass, entry_data[CONF_DEVICE])
+        func = getattr(device, service)
+        if func:
+            await func(call.data)
+
+    def build_service_name(entry_name, service) -> str:
+        """Build a service name for a node."""
+        return f"{entry_name.replace('-', '_')}_{service}"
 
     devices = []
 
@@ -51,53 +62,12 @@ async def async_setup(hass, config):
             discovery.async_load_platform(
                 hass, Platform.NOTIFY, DOMAIN, device_conf, config)
         )
-
-    def find_enity(name):
-        """Find entity by name."""
-
-        device = None
-        for device_conf in hass.data[DOMAIN][DATA_CONFIG_ENTRIES]:
-            if device_conf['name'] == name:
-                device = AwtrixTime(hass, device_conf[CONF_DEVICE])
-        if device:
-            return device
-        else:
-            raise ServiceValidationError(
-                translation_domain=DOMAIN,
-                translation_key="invalid_device",
-                translation_placeholders={
-                    "target": name, "domain": DOMAIN},
-            )
-
-    """Set up the an async service example component."""
-    @callback
-    def push_appdata_service(call: ServiceCall) -> None:
-        """AWTRIX app service."""
-
-        device = find_enity(call.data['device'])
-        hass.loop.create_task(device.push(
-            call.data['name'], call.data['data']))
-
-    @callback
-    def call_settings_service(call: ServiceCall) -> None:
-        """AWTRIX app setting service."""
-
-        device = find_enity(call.data['device'])
-        hass.loop.create_task(device.settings(
-            call.data['data']))
-
-    @callback
-    def call_switch_app_service(call: ServiceCall) -> None:
-        """AWTRIX app switch service."""
-
-        device = find_enity(call.data['device'])
-        hass.loop.create_task(device.switch_app(
-            call.data['name']))
-
-    # Register our service with Home Assistant.
-    hass.services.async_register(DOMAIN, 'push_app_data', push_appdata_service)
-    hass.services.async_register(DOMAIN, 'settings', call_settings_service)
-    hass.services.async_register(DOMAIN, 'switch_app', call_switch_app_service)
+        for service in SERVICES:
+            hass.services.async_register(
+                DOMAIN,
+                build_service_name(device_conf[CONF_NAME], service),
+                partial(service_handler, device_conf, service),
+        )
 
     # Return boolean to indicate that initialization was successfully.
     return True
