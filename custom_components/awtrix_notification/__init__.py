@@ -12,9 +12,17 @@ from homeassistant.helpers import (
     discovery,
     entity_registry as er,
 )
+from homeassistant.helpers.service import async_set_service_schema
 
 from .awtrix import AwtrixTime
-from .const import CONF_DEVICE, DATA_CONFIG_ENTRIES, DOMAIN, SERVICES
+from .const import (
+    CONF_DEVICE,
+    DATA_CONFIG_ENTRIES,
+    DOMAIN,
+    SERVICE_TO_FIELDS,
+    SERVICE_TO_SCHEMA,
+    SERVICES,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,11 +71,27 @@ async def async_setup(hass, config):
                 hass, Platform.NOTIFY, DOMAIN, device_conf, config)
         )
         for service in SERVICES:
+            service_name = build_service_name(device_conf[CONF_NAME], service)
+
             hass.services.async_register(
                 DOMAIN,
-                build_service_name(device_conf[CONF_NAME], service),
+                service_name,
                 partial(service_handler, device_conf, service),
-        )
+                schema=SERVICE_TO_SCHEMA[service]
+            )
+
+            # Register the service description
+            async_set_service_schema(
+                hass,
+                DOMAIN,
+                service_name,
+                {
+                    "description": (
+                        f"Calls the service {service_name} of the node AWTRIX"
+                    ),
+                    "fields": SERVICE_TO_FIELDS[service],
+                },
+            )
 
     # Return boolean to indicate that initialization was successfully.
     return True
