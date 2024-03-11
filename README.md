@@ -99,3 +99,18 @@ data:
 ver 20240301.01
 
 added service description
+
+ver 20240310.03
+
+experimental!
+create weather application
+
+```
+service: awtrix.awtrix_bedroom_weather_app
+data:
+ weather: weather.forecast_home
+ outside_temperature: sensor.easyweatherv1_6_4_outdoor_temperature
+ home_temperature: sensor.home_temperature
+ moon: sensor.moon_phase
+ sun: sun.sun
+```
