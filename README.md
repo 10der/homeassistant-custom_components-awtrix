@@ -114,3 +114,43 @@ data:
  moon: sensor.moon_phase
  sun: sun.sun
 ```
+
+- no need to upload icons
+- able to customize icons
+
+```
+service: awtrix.awtrix_bedroom_weather_app
+data:
+  weather: weather.forecast_home
+  home_temperature: sensor.home_temperature
+  sun: sun.sun
+  moon: sensor.moon_phase
+  icons:
+      clear-night: "a12181" 
+      cloudy: "a2283"
+      exceptional: "a2364"
+      fog: "17056"
+      hail: "a2441" 
+      lightning: "a630" 
+      lightning-rainy: "a49299" 
+      partlycloudy: "a2286" 
+      pouring: "a49300" 
+      rainy: "a2284" 
+      snowy: "a2289" 
+      snowy-rainy: "a49301" 
+      sunny: "a2282" 
+      windy: "a15618" 
+      windy-variant: "a15618" 
+      full_moon: "2314" 
+      waning_gibbous: "2315" 
+      last_quarter: "2316" 
+      waning_crescent: "2317" 
+      new_moon: "2318"
+      waxing_crescent: "2320" 
+      first_quarter: "2320" 
+      waxing_gibbous: "36234" 
+      home:  "96"
+      sunrise: "485" 
+      sunset: "486" 
+      unavailable:  "52176"
+```
