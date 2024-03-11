@@ -106,6 +106,18 @@ def temperature_color(temperature):
     return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
 
+def format_temperature(temperature):
+    """Format the temperature."""
+    return ("+" if temperature >=
+            0 else "") + f'{temperature:.0f}' + "°"
+
+def safe_cast(val, to_type, default=None):
+    """Safe casting."""
+    try:
+        return to_type(val)
+    except (ValueError, TypeError):
+        return default
+
 class AwtrixTime:
     """Allows to send updated to applications."""
 
@@ -186,8 +198,8 @@ class AwtrixTime:
                     if idx + 8 > 32:
                         break
 
-            forecast.append({"dt": [16.0, 1, ("+" if temperature >
-                                              0 else "") + f'{temperature:.0f}' + "°", temperature_color(temperature)]})
+            forecast.append({"dt": [16.0, 1, format_temperature(
+                temperature), temperature_color(temperature)]})
             icon = icons.get(weather)
             payload = {"draw":
                        forecast,
@@ -210,8 +222,7 @@ class AwtrixTime:
             icon = icons.get(moon)
             payload = {
                 "icon": icon,
-                "text":  ("+" if temperature >
-                          0 else "") + f'{temperature:.0f}' + "°",
+                "text":  format_temperature(temperature),
                 "color": temperature_color(temperature),
                 "lifetime": 900,
                 "repeat": 1
@@ -227,8 +238,7 @@ class AwtrixTime:
             icon = icons.get("home")
             payload = {
                 "icon": icon,
-                "text":  ("+" if temperature >
-                          0 else "") + f'{temperature:.0f}' + "°",
+                "text":  format_temperature(temperature),
                 "color": temperature_color(temperature),
                 "lifetime": 900,
                 "repeat": 1
@@ -296,7 +306,9 @@ class AwtrixTime:
                 outside_temperature = self.hass.states.get(
                     outside_temperature_entity)
                 if outside_temperature is not None:
-                    temperature = outside_temperature.state
+                    outside_temperature_value = safe_cast(outside_temperature.state, float)
+                    if outside_temperature_value is not None:
+                        temperature = outside_temperature_value
 
             templow = temperature
             forecast = weather.attributes.get("forecast")
@@ -360,14 +372,16 @@ class AwtrixTime:
                 home_temperature = self.hass.states.get(
                     home_temperature_entity)
                 if home_temperature is not None:
-                    payload = self.weather_home(int(home_temperature.state))
-                    payload = json.dumps(payload)
-                    service_data = {"payload_template": payload,
-                                    "topic": topic + "weather_home"}
+                    home_temperature_value = safe_cast(home_temperature.state, float)
+                    if home_temperature_value is not None:
+                        payload = self.weather_home(home_temperature_value)
+                        payload = json.dumps(payload)
+                        service_data = {"payload_template": payload,
+                                        "topic": topic + "weather_home"}
 
-                    await self.hass.services.async_call(
-                        "mqtt", "publish", service_data
-                    )
+                        await self.hass.services.async_call(
+                            "mqtt", "publish", service_data
+                        )
 
             # Sun
             sun_entity = data.get('sun')

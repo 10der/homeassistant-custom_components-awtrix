@@ -122,6 +122,7 @@ data:
 service: awtrix.awtrix_bedroom_weather_app
 data:
   weather: weather.forecast_home
+  outside_temperature: sensor.easyweatherv1_6_4_outdoor_temperature
   home_temperature: sensor.home_temperature
   sun: sun.sun
   moon: sensor.moon_phase
@@ -154,3 +155,6 @@ data:
       sunset: "486" 
       unavailable:  "52176"
 ```
+
+ver 20240311.01
+bug fixes
