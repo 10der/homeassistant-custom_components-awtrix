@@ -248,20 +248,19 @@ class AwtrixTime:
         except Exception:
             return {}
 
-    def weather_sun(self, next_rising, next_setting):
+    def weather_sun(self, next_rising, next_setting, sun_event_minute_threshold = 30):
         """Get sun rise/set app."""
 
         try:
             payload = {
             }
 
-            now = datetime.now()
-            rising = (datetime.fromisoformat(next_rising)).replace(tzinfo=None)
-            rising_local = dt_util.as_local(datetime.fromisoformat(next_rising)).time()
-            rising_str = rising_local.strftime('%H:%M')
-            delta = rising - now
+            now = dt_util.as_local(dt_util.now())
+            rising_local = dt_util.as_local(datetime.fromisoformat(next_rising))
+            rising_str = rising_local.time().strftime('%H:%M')
+            delta = rising_local - now
             min = delta.total_seconds() / 60
-            if min < 30:
+            if min < sun_event_minute_threshold:
                 icon = icons.get("sunrise")
                 payload = {
                     "icon": icon,
@@ -270,12 +269,11 @@ class AwtrixTime:
                     "repeat": 1
                 }
 
-            setting = (datetime.fromisoformat(next_setting)).replace(tzinfo=None)
-            setting_local = dt_util.as_local(datetime.fromisoformat(next_setting)).time()
-            setting_str = setting_local.strftime('%H:%M')
-            delta = setting - now
+            setting_local = dt_util.as_local(datetime.fromisoformat(next_setting))
+            setting_str = setting_local.time().strftime('%H:%M')
+            delta = setting_local - now
             min = delta.total_seconds() / 60
-            if min < 30:
+            if min < sun_event_minute_threshold:
                 icon = icons.get("sunset")
                 payload = {
                     "icon": icon,
@@ -345,8 +343,12 @@ class AwtrixTime:
             except Exception:
                 pass
 
+            customize = data.get('data') or {}
+
             # Forecast
             payload = self.weather_forecast(weather.state, temperature, hourly)
+            payload = payload | (customize.get('weather') or {})
+
             payload = json.dumps(payload)
             service_data = {"payload_template": payload,
                             "topic": topic + "weather"}
@@ -362,6 +364,8 @@ class AwtrixTime:
                 moon = self.hass.states.get(moon_entity)
                 moon_phase = moon.state
             payload = self.weather_night(moon_phase, templow)
+            payload = payload | (customize.get('weather_night') or {})
+
             payload = json.dumps(payload)
             service_data = {"payload_template": payload,
                             "topic": topic + "weather_night"}
@@ -379,6 +383,7 @@ class AwtrixTime:
                     home_temperature_value = safe_cast(home_temperature.state, float)
                     if home_temperature_value is not None:
                         payload = self.weather_home(home_temperature_value)
+                        payload = payload | (customize.get('weather_home') or {})
                         payload = json.dumps(payload)
                         service_data = {"payload_template": payload,
                                         "topic": topic + "weather_home"}
@@ -388,12 +393,14 @@ class AwtrixTime:
                         )
 
             # Sun
+            sun_event_minute_threshold = customize.get('sun_event_minute_threshold') or 30
             sun_entity = data.get('sun')
             if sun_entity:
                 sun = self.hass.states.get(sun_entity)
                 if sun is not None:
                     payload = self.weather_sun(sun.attributes.get(
-                        'next_rising'), sun.attributes.get('next_setting'))
+                        'next_rising'), sun.attributes.get('next_setting'), sun_event_minute_threshold)
+                    payload = payload | (customize.get('weather_sun') or {})
                     payload = json.dumps(payload)
                     service_data = {"payload_template": payload,
                                     "topic": topic + "weather_sun"}
