@@ -180,3 +180,6 @@ data:
 
 app names 
 weather, weather_night, weather_sun, weather_home
+
+ver 20240318.01
+bugfix
