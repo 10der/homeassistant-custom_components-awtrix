@@ -183,3 +183,34 @@ weather, weather_night, weather_sun, weather_home
 
 ver 20240318.01
 bugfix
+
+
+ver 20240320.01
+
+```
+service: awtrix.awtrix_bedroom_rtttl
+data: 
+ rtttl: "two_short:d=4,o=5,b=100:16e6,16e6"
+```
+
+```
+service: awtrix.awtrix_bedroom_sound
+data:
+ sound: beep
+```
+
+Hold notification
+```
+service: notify.awtrix_bedroom
+data:
+  message: "Hello!"
+  data: 
+    hold: true
+```
+
+Dismiss hold notification
+```
+service: notify.awtrix_bedroom
+data:
+  message: ""
+```
