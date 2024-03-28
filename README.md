@@ -214,3 +214,20 @@ service: notify.awtrix_bedroom
 data:
   message: ""
 ```
+
+ver 20240328.01
+able to add weather custom pages
+
+```
+service: awtrix.awtrix_bedroom_weather_app
+data:
+  weather: weather.forecast_home
+  outside_temperature: sensor.easyweatherv1_6_4_outdoor_temperature
+  home_temperature: sensor.home_temperature
+  sun: sun.sun
+  moon: sensor.moon_phase
+  frames:
+    wind: 
+      icon: "2298"
+      text: "{{ states('sensor.easyweatherv1_6_4_wind_gust') }} km/h "
+```
