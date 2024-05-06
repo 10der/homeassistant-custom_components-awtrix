@@ -123,7 +123,6 @@ action:
       user_data: !input additional_options
       value_template: !input value_template
       user_options: !input user_options
-      value_template: !input value_template
       payload: |-
          {
            {{('"icon"' if value_template.icon) ~ (":" if value_template.icon) ~ ('"' ~ value_template.icon ~ '"' if value_template.icon) }}
