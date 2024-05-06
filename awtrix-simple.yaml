@@ -5,8 +5,8 @@ blueprint:
   input:
     app_name:
       name: (Required) Application name
-      description: 'Application name'
-      default: 'awtrix_app'
+      description: "Application name"
+      default: "awtrix_app"
       selector:
         text:
           multiline: false
@@ -14,8 +14,8 @@ blueprint:
 
     app_icon:
       name: Application Icon
-      description: 'Application icon'
-      default: ''
+      description: "Application icon"
+      default: ""
       selector:
         text:
           multiline: false
@@ -23,17 +23,17 @@ blueprint:
 
     prefix_text:
       name: Text prefix
-      description: 'Text prefix'
+      description: "Text prefix"
       selector:
         object:
-      default: ''
+      default: ""
 
     suffix_text:
       name: Text suffix
-      description: 'Text suffix'
+      description: "Text suffix"
       selector:
         object:
-      default: ''
+      default: ""
 
     entity:
       name: Entity
@@ -74,13 +74,13 @@ blueprint:
         duration: 5
 
     additional_conditions:
-          name: Additional conditions
-          description: |
-            Extra conditions you may want to add to this automation 
-            (Example: Home occupied, TV on, etc)
-          default: []
-          selector:
-            condition:
+      name: Additional conditions
+      description: |
+        Extra conditions you may want to add to this automation 
+        (Example: Home occupied, TV on, etc)
+      default: []
+      selector:
+        condition:
 
     awtrix_device:
       name: AWTRIX device
@@ -102,7 +102,7 @@ trigger:
 #  - platform: event
 #    event_type: automation_reloaded
 
-condition: 
+condition:
   - alias: User pick
     condition: !input additional_conditions
 
@@ -116,20 +116,20 @@ variables:
   suffix_text: !input suffix_text
 
 action:
- - choose: []
-   default: !input pre_actions
+  - choose: []
+    default: !input pre_actions
 
- - variables:
+  - variables:
       user_data: !input additional_options
       value_template: !input value_template
       user_options: !input user_options
       payload: |-
-         {
-           {{('"icon"' if value_template.icon) ~ (":" if value_template.icon) ~ ('"' ~ value_template.icon ~ '"' if value_template.icon) }}
-           {{"," if value_template.icon}} "text":"{{prefix_text~value_template.text~suffix_text}}"
-         }
+        {
+          {{('"icon"' if value_template.icon) ~ (":" if value_template.icon) ~ ('"' ~ value_template.icon ~ '"' if value_template.icon) }}
+          {{"," if value_template.icon}} "text":"{{prefix_text~value_template.text~suffix_text}}"
+        }
 
- - service: awtrix.{{awtrix_device_name}}_push_app_data
-   data: 
-     name: "{{app_name}}"
-     data: "{{ dict(payload, **user_options) }}"
+  - service: awtrix.{{awtrix_device_name}}_push_app_data
+    data:
+      name: "{{app_name}}"
+      data: "{{ dict(payload, **user_options) }}"
