@@ -1,0 +1,136 @@
+blueprint:
+  name: AWTRIX show entity
+  description: Show entity
+  domain: automation
+  input:
+    app_name:
+      name: (Required) Application name
+      description: 'Application name'
+      default: 'awtrix_app'
+      selector:
+        text:
+          multiline: false
+          multiple: false
+
+    app_icon:
+      name: Application Icon
+      description: 'Application icon'
+      default: ''
+      selector:
+        text:
+          multiline: false
+          multiple: false
+
+    prefix_text:
+      name: Text prefix
+      description: 'Text prefix'
+      selector:
+        object:
+      default: ''
+
+    suffix_text:
+      name: Text suffix
+      description: 'Text suffix'
+      selector:
+        object:
+      default: ''
+
+    entity:
+      name: Entity
+      description: Entity
+      selector:
+        entity:
+          multiple: false
+
+    pre_actions:
+      name: Actions
+      description: Actions when starting...
+      selector:
+        action:
+      default:
+
+    additional_options:
+      name: Additional options
+      description: Extra options
+      selector:
+        object:
+      default: {}
+
+    value_template:
+      name: Value template
+      description: Value template
+      selector:
+        object:
+      default:
+        icon: "{{app_icon}}"
+        text: "{{states(entity_id)}}"
+
+    user_options:
+      name: AWTRIX application options
+      description: AWTRIX application useroptions.
+      selector:
+        object:
+      default:
+        duration: 5
+
+    additional_conditions:
+          name: Additional conditions
+          description: |
+            Extra conditions you may want to add to this automation 
+            (Example: Home occupied, TV on, etc)
+          default: []
+          selector:
+            condition:
+
+    awtrix_device:
+      name: AWTRIX device
+      description: The AWTRIX device for show app.
+      selector:
+        device:
+          integration: mqtt
+          manufacturer: Blueforcer
+          model: AWTRIX 3
+          multiple: false
+
+trigger:
+  - platform: state
+    entity_id: !input entity
+
+#  - platform: homeassistant
+#    event: start
+
+#  - platform: event
+#    event_type: automation_reloaded
+
+condition: 
+  - alias: User pick
+    condition: !input additional_conditions
+
+variables:
+  awtrix: !input awtrix_device
+  awtrix_device_name: "{{ iif( device_attr(awtrix, 'name_by_user') != none, device_attr(awtrix, 'name_by_user'), device_attr(awtrix, 'name') ) }}"
+  entity_id: !input entity
+  app_name: !input app_name
+  app_icon: !input app_icon
+  prefix_text: !input prefix_text
+  suffix_text: !input suffix_text
+
+action:
+ - choose: []
+   default: !input pre_actions
+
+ - variables:
+      user_data: !input additional_options
+      value_template: !input value_template
+      user_options: !input user_options
+      value_template: !input value_template
+      payload: |-
+         {
+           {{('"icon"' if value_template.icon) ~ (":" if value_template.icon) ~ ('"' ~ value_template.icon ~ '"' if value_template.icon) }}
+           {{"," if value_template.icon}} "text":"{{prefix_text~value_template.text~suffix_text}}"
+         }
+
+ - service: awtrix.{{awtrix_device_name}}_push_app_data
+   data: 
+     name: "{{app_name}}"
+     data: "{{ dict(payload, **user_options) }}"
