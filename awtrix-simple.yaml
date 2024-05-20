@@ -134,8 +134,6 @@ variables:
   entity_id: !input entity
   app_name: !input app_name
   app_icon: !input app_icon
-  prefix_text: !input prefix_text
-  suffix_text: !input suffix_text
   additional_conditions: !input additional_conditions
 
 action:
@@ -153,6 +151,8 @@ action:
       # deprecated !
       user_data: !input additional_options
       value_template: !input value_template
+      prefix_text: !input prefix_text
+      suffix_text: !input suffix_text
       user_options: !input user_options
       payload: |-
         {
