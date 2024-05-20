@@ -126,9 +126,9 @@ trigger:
   - platform: template
     value_template: !input extra_trigger
 
-condition:
-  - alias: User pick
-    condition: !input additional_conditions
+condition: []
+#  - alias: User pick
+#    condition: !input additional_conditions
 
 variables:
   entity_id: !input entity
@@ -136,6 +136,7 @@ variables:
   app_icon: !input app_icon
   prefix_text: !input prefix_text
   suffix_text: !input suffix_text
+  additional_conditions: !input additional_conditions
 
 action:
   - choose: []
@@ -165,7 +166,15 @@ action:
        - variables:
             awtrix_device_name: "{{ iif( device_attr(repeat.item, 'name_by_user') != none, device_attr(repeat.item, 'name_by_user'), device_attr(repeat.item, 'name') ) }}"
 
-       - service: awtrix.{{awtrix_device_name}}_push_app_data
-         data:
-           name: "{{app_name}}"
-           data: "{{ dict(payload, **user_options) }}"
+       - if: !input additional_conditions
+         then:
+           - service: awtrix.{{awtrix_device_name}}_push_app_data
+             data:
+               name: "{{app_name}}"
+               data: "{{ dict(payload, **user_options) }}"
+
+         else:
+           - service: awtrix.{{awtrix_device_name}}_push_app_data
+             data:
+               name: "{{app_name}}"
+               data: {}
