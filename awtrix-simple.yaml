@@ -143,13 +143,14 @@ action:
       user_data: !input additional_options
 
       value_template: "{{ user_data.get('value_template', states(entity_id)) }}"
+      icon_template: "{{ user_data.get('icon_template', app_icon) }}"
       prefix_text: !input prefix_text
       suffix_text: !input suffix_text
       user_options: !input user_options
       payload: |-
         {
-          {{('"icon"' if app_icon) ~ (":" if app_icon) ~ ('"' ~ app_icon ~ '"' if app_icon) }}
-          {{"," if app_icon}} "text":"{{prefix_text~value_template~suffix_text}}"
+          {{('"icon"' if icon_template) ~ (":" if icon_template) ~ ('"' ~ icon_template ~ '"' if icon_template) }}
+          {{"," if icon_template}} "text":"{{prefix_text~value_template~suffix_text}}"
         }
 
   - repeat:
