@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 
 from homeassistant.components.media_source import Unresolvable
+from homeassistant.const import STATE_UNAVAILABLE
 import homeassistant.util.dt as dt_util
 
 """Support for AWTRIX service."""
@@ -146,6 +147,9 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
+            if state.state == STATE_UNAVAILABLE:
+                return
+
             if "name" not in data:
                 raise Unresolvable("No app name")
             app_id = data["name"]
@@ -155,7 +159,7 @@ class AwtrixTime:
             msg = data.copy()
 
             payload = json.dumps(msg) if len(msg) else ""
-            service_data = {"payload_template": payload,
+            service_data = {"payload": payload,
                             "topic": topic}
 
             return await self.hass.services.async_call(
@@ -167,13 +171,16 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
+            if state.state == STATE_UNAVAILABLE:
+                return
+
             topic = state.state + "/switch"
             if "name" not in data:
                 raise Unresolvable("No app name")
             app_id = data["name"]
 
             payload = json.dumps({"name": app_id})
-            service_data = {"payload_template": payload,
+            service_data = {"payload": payload,
                             "topic": topic}
 
             return await self.hass.services.async_call(
@@ -185,13 +192,15 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
-            topic = state.state + "/settings"
+            if state.state == STATE_UNAVAILABLE:
+                return
 
+            topic = state.state + "/settings"
             data = data or {}
             msg = data.copy()
 
             payload = json.dumps(msg)
-            service_data = {"payload_template": payload,
+            service_data = {"payload": payload,
                             "topic": topic}
 
             return await self.hass.services.async_call(
@@ -335,9 +344,10 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
-            topic = state.state + "/custom/"
-            # topic = "temp" + "/custom/"
+            if state.state == STATE_UNAVAILABLE:
+                return
 
+            topic = state.state + "/custom/"
             custom_icons = data.get("icons")
             for icon in custom_icons:
                 icons[icon] = custom_icons[icon]
@@ -395,7 +405,7 @@ class AwtrixTime:
             payload = merge_custom_data(payload, customize.get('weather'))
 
             payload = json.dumps(payload)
-            service_data = {"payload_template": payload,
+            service_data = {"payload": payload,
                             "topic": topic + "weather"}
 
             await self.hass.services.async_call(
@@ -410,7 +420,7 @@ class AwtrixTime:
                     payload, customize.get('weather_forecast'))
 
                 payload = json.dumps(payload)
-                service_data = {"payload_template": payload,
+                service_data = {"payload": payload,
                                 "topic": topic + "weather_forecast"}
 
                 await self.hass.services.async_call(
@@ -428,7 +438,7 @@ class AwtrixTime:
                         payload, customize.get('weather_night'))
 
                     payload = json.dumps(payload)
-                    service_data = {"payload_template": payload,
+                    service_data = {"payload": payload,
                                     "topic": topic + "weather_night"}
 
                     await self.hass.services.async_call(
@@ -447,7 +457,7 @@ class AwtrixTime:
                     payload = merge_custom_data(
                         {"lifetime": 900, "repeat": 1}, payload)
                 payload = json.dumps(payload)
-                service_data = {"payload_template": payload,
+                service_data = {"payload": payload,
                                 "topic": topic + "weather_" + frame}
 
                 await self.hass.services.async_call(
@@ -467,7 +477,7 @@ class AwtrixTime:
                         payload = merge_custom_data(
                             payload, customize.get('weather_home'))
                         payload = json.dumps(payload)
-                        service_data = {"payload_template": payload,
+                        service_data = {"payload": payload,
                                         "topic": topic + "weather_home"}
 
                         await self.hass.services.async_call(
@@ -486,7 +496,7 @@ class AwtrixTime:
                     payload = merge_custom_data(
                         payload, customize.get('weather_sun'))
                     payload = json.dumps(payload)
-                    service_data = {"payload_template": payload,
+                    service_data = {"payload": payload,
                                     "topic": topic + "weather_sun"}
 
                     await self.hass.services.async_call(
@@ -500,13 +510,15 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
-            topic = state.state + "/rtttl"
+            if state.state == STATE_UNAVAILABLE:
+                return
 
+            topic = state.state + "/rtttl"
             if "rtttl" not in data:
                 raise Unresolvable("No rtttl.")
 
             rtttl_text = data["rtttl"]
-            service_data = {"payload_template": rtttl_text,
+            service_data = {"payload": rtttl_text,
                             "topic": topic}
 
             return await self.hass.services.async_call(
@@ -518,14 +530,16 @@ class AwtrixTime:
 
         state = self.hass.states.get(self.entity_id)
         if state is not None and state.state is not None:
-            topic = state.state + "/sound"
+            if state.state == STATE_UNAVAILABLE:
+                return
 
+            topic = state.state + "/sound"
             if "sound" not in data:
                 raise Unresolvable("No sound name")
 
             sound_id = data["sound"]
             payload = json.dumps({"sound": sound_id})
-            service_data = {"payload_template": payload,
+            service_data = {"payload": payload,
                             "topic": topic}
 
             return await self.hass.services.async_call(

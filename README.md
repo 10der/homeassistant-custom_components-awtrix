@@ -231,3 +231,26 @@ data:
       icon: "2298"
       text: "{{ states('sensor.easyweatherv1_6_4_wind_gust') }} km/h "
 ```
+
+simaple automation
+
+```
+alias: bathroom current temperature
+description: bathroom current temperature
+trigger:
+  - platform: time_pattern
+    minutes: /5
+condition: []
+action:
+  - service: awtrix.awtrix_bedroom_push_app_data
+    data:
+      name: home_temperature
+      data:
+        text: "{{states('sensor.bathroom_current_temperature')}}°"
+        icon: "2056"
+        duration: 5
+        pushIcon: 2
+        lifetime: 900
+        repeat: 1
+mode: single
+```
