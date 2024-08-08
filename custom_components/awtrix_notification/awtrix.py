@@ -1,7 +1,12 @@
 """Core components of AWTRIX Light."""
 
+import base64
 from datetime import datetime
+from io import BytesIO
 import json
+
+from PIL import Image
+import requests
 
 from homeassistant.components.media_source import Unresolvable
 from homeassistant.const import STATE_UNAVAILABLE
@@ -157,6 +162,12 @@ class AwtrixTime:
 
             data = data.get("data", {}) or {}
             msg = data.copy()
+
+            if 'icon' in msg:
+                if str(msg["icon"]).startswith(('http://', 'https://')):
+                    icon = await self.hass.async_add_executor_job(getIcon, str(msg["icon"]))
+                    if icon:
+                        msg["icon"] = icon
 
             payload = json.dumps(msg) if len(msg) else ""
             service_data = {"payload": payload,
@@ -545,3 +556,18 @@ class AwtrixTime:
             return await self.hass.services.async_call(
                 "mqtt", "publish", service_data
             )
+
+def getIcon(url):
+    """Get icon by url."""
+    try:
+        timeout=5
+        response = requests.get(url, timeout=timeout)
+        if response and response.status_code == 200:
+            pil_im = Image.open(BytesIO(response.content))
+            pil_im = pil_im.convert('RGB')
+            b = BytesIO()
+            pil_im.save(b, 'jpeg')
+            im_bytes = b.getvalue()
+            return base64.b64encode(im_bytes).decode()
+    except Exception:
+        pass
