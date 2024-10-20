@@ -50,6 +50,20 @@ blueprint:
       default:
         False
 
+    boolean_time_update:
+      name: Turn on periodic update (Optional)
+      description: Turn on periodic updates
+      default: false
+      selector:
+        boolean:
+
+    update_frequency:
+      name: Update frequency
+      description: Update frequency (minutes)
+      default: "/1"
+      selector:
+        text:
+
 #    extra_triggers:
 #      name: Extra Triggers
 #      description: Additional triggers to actions.
@@ -107,25 +121,45 @@ blueprint:
 trigger:
   - platform: state
     entity_id: !input entity  
+    id: update
 
   - platform: homeassistant
     event: start
+    id: update
 
   - platform: event
     event_type: automation_reloaded
+    id: update
 
   - platform: template
     value_template: !input extra_trigger
+    id: update
 
-condition: []
-#  - alias: User pick
-#    condition: !input additional_conditions
+  - platform: time_pattern
+    minutes: !input update_frequency
+    id: timer
 
 variables:
   entity_id: !input entity
   app_name: !input app_name
   app_icon: !input app_icon
   additional_conditions: !input additional_conditions
+  boolean_time_update: !input boolean_time_update
+
+#condition: []
+condition:
+  - condition: or
+    conditions:
+      - condition: trigger
+        id:
+          - update
+      - condition: and
+        conditions:
+          - condition: trigger
+            id:
+              - timer
+          - condition: template
+            value_template: "{{ boolean_time_update }}"
 
 action:
   - choose: []
