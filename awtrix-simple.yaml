@@ -42,37 +42,12 @@ blueprint:
         object:
       default: ""
 
-    extra_trigger:
-      name: Extra trigger
-      description: Additional trigger to actions.
-      selector:
-        object:
+    extra_triggers:
+      name: Extra Triggers
+      description: Additional triggers to actions.
       default:
-        False
-
-    boolean_time_update:
-      name: Turn on periodic update (Optional)
-      description: Turn on periodic updates
-      default: false
       selector:
-        boolean:
-
-    update_frequency:
-      name: Update frequency
-      description: Update frequency (minutes)
-      default: "/1"
-      selector:
-        text:
-
-#    extra_triggers:
-#      name: Extra Triggers
-#      description: Additional triggers to actions.
-#      default:                        #Add a default trigger list
-#        #- platform: state             #
-#        #  entity_id: !input entity    #
-#
-#      selector:
-#          trigger:
+          trigger:
 
     pre_actions:
       name: Actions
@@ -116,8 +91,6 @@ blueprint:
           model: AWTRIX 3
           multiple: true
 
-#trigger: !input extra_triggers
-
 trigger:
   - platform: state
     entity_id: !input entity  
@@ -131,35 +104,15 @@ trigger:
     event_type: automation_reloaded
     id: update
 
-  - platform: template
-    value_template: !input extra_trigger
-    id: update
-
-  - platform: time_pattern
-    minutes: !input update_frequency
-    id: timer
+  - triggers: !input extra_triggers
 
 variables:
   entity_id: !input entity
   app_name: !input app_name
   app_icon: !input app_icon
   additional_conditions: !input additional_conditions
-  boolean_time_update: !input boolean_time_update
 
-#condition: []
-condition:
-  - condition: or
-    conditions:
-      - condition: trigger
-        id:
-          - update
-      - condition: and
-        conditions:
-          - condition: trigger
-            id:
-              - timer
-          - condition: template
-            value_template: "{{ boolean_time_update }}"
+condition: []
 
 action:
   - choose: []
