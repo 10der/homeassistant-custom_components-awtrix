@@ -53,6 +53,9 @@ class AwtrixTime:
                     if icon:
                         msg["icon"] = icon
 
+            if 'text' in msg:
+                msg['text'] = str(msg['text'])
+
             payload = json.dumps(msg) if len(msg) else ""
             service_data = {"payload": payload,
                             "topic": topic}
