@@ -1,0 +1,26 @@
+alias: AWTRIX - SUN_RISE_TIME
+description: ""
+use_blueprint:
+  path: 10der/awtrix-simple.yaml
+  input:
+    app_name: awtrix_app_sun
+    entity: sun.sun
+    app_icon: "485"
+    awtrix_device:
+      - 3135904cc76cc8342758e395c7c19c10
+      - cba036557ec6a93c46e1772448fac471
+    additional_conditions:
+      - condition: sun
+        after: sunrise
+        after_offset: "-00:30:00"
+      - condition: sun
+        before: sunrise
+        before_offset: "+00:05:00"
+    user_options:
+      duration: 5
+      lifetime: 300
+    additional_options:
+      value_template: >-
+        {{state_attr(entity_id, 'next_rising') | as_timestamp |
+        timestamp_custom('%H:%M',true)}}
+

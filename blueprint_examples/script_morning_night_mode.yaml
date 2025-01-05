@@ -1,0 +1,41 @@
+sequence:
+  - if:
+      - condition: template
+        value_template: "{{on_off}}"
+    then:
+      - action: awtrix.awtrix_bedroom_settings
+        data:
+          WD: true
+          TIME_COL:
+            - 255
+            - 255
+            - 255
+          TMODE: 1
+          BRI: 1
+          ABRI: true
+          ATRANS: true
+    else:
+      - action: awtrix.awtrix_bedroom_settings
+        data:
+          WD: false
+          TIME_COL:
+            - 255
+            - 0
+            - 0
+          TMODE: 0
+          BRI: 1
+          ABRI: false
+          ATRANS: false
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+      - action: awtrix.awtrix_bedroom_switch_app
+        data:
+          name: Time
+fields:
+  on_off:
+    selector:
+      boolean: {}
+    name: on_off
+    required: true

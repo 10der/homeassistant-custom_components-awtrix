@@ -1,0 +1,37 @@
+alias: AWTRIX - HOME_TEMPERATURE
+description: ""
+use_blueprint:
+  path: 10der/awtrix-simple.yaml
+  input:
+    app_name: awtrix_app_home
+    entity: sensor.home_temperature
+    suffix_text: °
+    awtrix_device:
+      - 3135904cc76cc8342758e395c7c19c10
+      - cba036557ec6a93c46e1772448fac471
+    app_icon: "96"
+    value_template: null
+    user_options:
+      duration: 5
+      pos: 2
+      color: |-
+        {{user_data.colors[(colors.items() | 
+            map(attribute='0') |  
+            map('int') |  
+            sort | select('>=', value_template ) | 
+            first) | string]}} 
+    additional_options:
+      colors:
+        "0": "#00ff7f"
+        "5": "#00ff2a"
+        "10": "#2aff00"
+        "15": "#7fff00"
+        "20": "#d4ff00"
+        "25": "#ffd400"
+        "30": "#ff7f00"
+        "35": "#ff5f00"
+        "-15": "#007fff"
+        "-10": "#00d4ff"
+        "-5": "#00ffd4"
+      value_template: "{{states(entity_id) | round}}"
+    prefix_text: "{{ '+' if value_template > 0 }}"

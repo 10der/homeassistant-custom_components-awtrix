@@ -1,0 +1,73 @@
+alias: AWTRIX - NIGHT_TEMERATURE
+description: ""
+use_blueprint:
+  path: 10der/awtrix-simple.yaml
+  input:
+    awtrix_device:
+      - 3135904cc76cc8342758e395c7c19c10
+      - cba036557ec6a93c46e1772448fac471
+    app_name: awtrix_app_night
+    entity: weather.forecast_home
+    pre_actions:
+      - target:
+          entity_id:
+            - weather.forecast_home
+        data:
+          type: daily
+        response_variable: forecast
+        action: weather.get_forecasts
+    user_options:
+      duration: 5
+      icon: "{{user_data.icons[states('sensor.moon_phase')]}}"
+      text: "{{ '+' if value > 0 }}{{value}}°"
+      pos: 1
+      color: |-
+        {{user_data.colors[(user_data.colors.items() | 
+            map(attribute='0') |  
+            map('int') |  
+            sort | select('>=', value) | 
+            first) | string]}}
+    additional_options:
+      icons:
+        clear-night: a12181
+        cloudy: a2283
+        exceptional: a2364
+        fog: "17056"
+        hail: a2441
+        lightning: a630
+        lightning-rainy: a49299
+        partlycloudy: a2286
+        pouring: a49300
+        rainy: a2284
+        snowy: a2289
+        snowy-rainy: a49301
+        sunny: a2282
+        windy: a15618
+        windy-variant: a15618
+        full_moon: "2314"
+        waning_gibbous: "2315"
+        last_quarter: "2316"
+        waning_crescent: "2317"
+        new_moon: "2318"
+        waxing_crescent: "2320"
+        first_quarter: "2320"
+        waxing_gibbous: "36234"
+        home: "96"
+        sunrise: "485"
+        sunset: "486"
+        unavailable: "52176"
+      colors:
+        "0": "#00ff7f"
+        "5": "#00ff2a"
+        "10": "#2aff00"
+        "15": "#7fff00"
+        "20": "#d4ff00"
+        "25": "#ffd400"
+        "30": "#ff7f00"
+        "-15": "#007fff"
+        "-10": "#00d4ff"
+        "-5": "#00ffd4"
+      value: >-
+        {{forecast['weather.forecast_home'].forecast |  map(attribute='templow')
+        |  first | round}}
+    prefix_text: {}
