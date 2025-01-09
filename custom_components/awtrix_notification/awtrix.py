@@ -54,7 +54,7 @@ class AwtrixTime:
                         msg["icon"] = icon
 
             if 'text' in msg:
-                if isinstance((msg['text']), int) or isinstance((msg['text']), float):
+                if isinstance(msg['text'], (int, float)):
                     msg['text'] = str(msg['text'])
                 else:
                     msg['text']
