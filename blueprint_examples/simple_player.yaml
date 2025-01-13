@@ -1,0 +1,49 @@
+alias: AWTRIX SIMPLE PLAYER
+description: ""
+use_blueprint:
+  path: 10der/awtrix-simple.yaml
+  input:
+    awtrix_device:
+      - 3135904cc76cc8342758e395c7c19c10
+    app_icon: >-
+      /9j/4AAQSkZJRgABAgEASABIAAD/4QDKRXhpZgAATU0AKgAAAAgABgESAAMAAAABAAEAAAEaAAUAAAABAAAAVgEbAAUAAAABAAAAXgEoAAMAAAABAAIAAAITAAMAAAABAAEAAIdpAAQAAAABAAAAZgAAAAAAAABIAAAAAQAAAEgAAAABAAeQAAAHAAAABDAyMjGRAQAHAAAABAECAwCgAAAHAAAABDAxMDCgAQADAAAAAQABAACgAgAEAAAAAQAAAAigAwAEAAAAAQAAAAikBgADAAAAAQAAAAAAAAAAAAD/wAARCAAIAAgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9sAQwABAQEBAQECAQECAwICAgMEAwMDAwQGBAQEBAQGBwYGBgYGBgcHBwcHBwcHCAgICAgICQkJCQkLCwsLCwsLCwsL/9sAQwECAgIDAwMFAwMFCwgGCAsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsL/90ABAAB/9oADAMBAAIRAxEAPwD8R/2bvjdd/sOeKvhP+zJqHjTwH8P9Obw7b+NfHviPT7aPVtQ1VPtF/fQ6O93AsscjyafLAISAHAbNrNKHhjn/AF+/4fO/8E1f+ikf+UfVf/kOv42v2vf+Sr6T/wBiT4H/APUc02vl6v5qxnA+Azmnh82xLcataCnO0KTvKUpNu86c5dbJc1lFJLY/Z8NxPi8tnWwFFXp05csbyqKyikkrRnFeb01bbe5//9k=
+    entity: media_player.sonos_roam_sl
+    value_template:
+      icon: "{{app_icon}}"
+      text: >
+        {{ playing_state~': '~(artist_template ~ ' - ' if artist_template else
+        '') ~ (title_template if title_template else '-') ~ (' ÷ ' ~
+        album_template ~ ' ÷ ' if album_template else '') }}
+    additional_options:
+      playing_state: "{{ states(entity_id) }}"
+      title_template: "{{ state_attr(entity_id, 'media_title') }}"
+      album_template: "{{ state_attr(entity_id, 'media_album_name') }}"
+      artist_template: "{{ state_attr(entity_id, 'media_artist') }}"
+      media_channel_template: "{{ state_attr(entity_id, 'media_channel') }}"
+      playing_percent: >-
+        {{ (100 - ((state_attr(entity_id, 'media_duration') | default(0, true) -
+        (state_attr(entity_id, 'media_position') | default(0, true) +
+        as_timestamp(now()) - as_timestamp(state_attr(entity_id,
+        'media_position_updated_at') | default(now(), true)))) / 60) * 100 /
+        (state_attr(entity_id, 'media_duration') | default(1, true)  / 60)) |
+        int }}
+      value_template: >-
+        {{ playing_state~': '~(media_channel_template ~ ':' if
+        media_channel_template else '')~(artist_template ~ ' - ' if
+        artist_template else '') ~ (title_template if title_template else '-') ~
+        (' ÷ ' ~ album_template ~ ' ÷ ' if album_template else '') }}
+    app_name: awtrix_app_player
+    user_options:
+      duration: 15
+      repeat: 1
+      progress: "{{playing_percent if playing_percent <= 100 else 100}}"
+      progressC: 18B04C
+      progressBC: "#333333"
+      lifetime: 900
+    additional_conditions:
+      - condition: template
+        value_template: "{{ playing_state == 'playing' }}"
+    boolean_time_update: true
+    extra_triggers:
+      - trigger: time_pattern
+        minutes: /1
