@@ -1,4 +1,8 @@
-# homeassistant-custom_components-awtrix
+# homeassistant custom_components awtrix3 (OLD)
+
+[![Buy me a cofee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/10der)
+
+
 HASS awtrix 
 
 just add to
