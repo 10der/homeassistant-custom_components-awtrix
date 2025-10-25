@@ -134,11 +134,21 @@ action:
       prefix_text: !input prefix_text
       suffix_text: !input suffix_text
       user_options: !input user_options
+
       payload: |-
-        {
-          {{('"icon"' if icon_template) ~ (":" if icon_template) ~ ('"' ~ icon_template ~ '"' if icon_template) }}
-          {{"," if icon_template}} "text":"{{prefix_text~value_template~suffix_text}}"
-        }
+        {% set full_text = prefix_text ~ value_template ~ suffix_text %}
+        {% set payload_dict = {} %}
+
+        {% if full_text is not none and full_text | string | trim != "" %}
+          {% set payload_dict = payload_dict | combine({"text": full_text}) %}
+        {% endif %}
+
+        {% if icon_template is not none and icon_template | string | trim != "" %}
+          {% set payload_dict = payload_dict | combine({"icon": icon_template}) %}
+        {% endif %}
+
+        {{ payload_dict | tojson }}
+
 
   - repeat:
      for_each: "{{ device_ids }}"
@@ -151,7 +161,7 @@ action:
            - service: awtrix.{{awtrix_device_name}}_push_app_data
              data:
                name: "{{app_name}}"
-               data: "{{ dict(payload, **user_options) }}"
+               data: "{{ dict(payload, **user_options) if payload | length > 0 else {} }}"
 
          else:
            - service: awtrix.{{awtrix_device_name}}_push_app_data
